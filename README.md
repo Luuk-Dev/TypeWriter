@@ -2,9 +2,13 @@
 Create easily a TypeWriter effect for your website
 
 > Written by Luuk Walstra
+> 
 > Discord: Luuk#8524
+> 
 > Github: https://github.com/Luuk-Dev
+> 
 > Replit: https://replit.com/@LuukDev
+> 
 > Repository: https://github.com/Luuk-Dev/TypeWriter
 
 ## How to use
