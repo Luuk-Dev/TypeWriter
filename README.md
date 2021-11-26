@@ -19,7 +19,7 @@ You need to call the `TypeWriter` class in your JavaScript. The class has two pa
    - speed: The speed of the cursor in miliseconds. Default is `1000`ms.
    - size: The size of the cursor in CSS. You can set the size for example to `28px`. Default is the `larger` property value.
    - id: The id of the `style` element which will be added in the `head` element for the cursor. You can customize this so you will be able to find it back easy. Default is `TypeWriter_Effect_CSS`.
-- onend: A callback which will be fired once the TypeWriter ends. Only available if the `loop` is set to `false`.
+- onend: A callback which will be called once the TypeWriter ends. Only available if the `loop` is set to `false`.
 
 ## Demo
 Watch a live demo [here](https://typewriter.luukdev.repl.co)
