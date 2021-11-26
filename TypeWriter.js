@@ -97,6 +97,9 @@ class TypeWriter{
                 await this.__wait(this.timeout);
             }
             if(this.options.loop) this.start();
+            else {
+              if(typeof this.options.onend === 'function') this.options.onend.call(this);
+            }
         })();
     }
     __wait(ms){
