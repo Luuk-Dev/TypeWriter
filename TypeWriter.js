@@ -20,14 +20,15 @@ class TypeWriter{
         const defaultcursor = {
           speed: 1000,
           size: 'larger',
-          id: 'TypeWriter_Effect_CSS'
+          id: 'TypeWriter_Effect_CSS',
+          enabled: true
         };
         const cursor = this.options.cursor || defaultcursor;
         const stylesheet = document.createElement(`style`);
         stylesheet.type = "text/css";
         stylesheet.innerHTML = `#typewriter-effect{font-size:${cursor.size || defaultcursor.size};animation:TypeWriter ${(cursor.speed || defaultcursor.speed)/1000}s infinite;}@keyframes TypeWriter{0%{opacity: 0;}50%{opacity: 1;}100%{opacity: 0;}}`;
         stylesheet.id = cursor.id || defaultcursor.id;
-        document.head.appendChild(stylesheet);
+        if((cursor['enabled'] || defaultcursor.enabled) === true) document.head.appendChild(stylesheet);
     }
     wait(ms){
         if(typeof ms !== 'number') return console.error(`Invalid number! MS must be a number.`);
@@ -49,7 +50,14 @@ class TypeWriter{
         return this;
     }
     start(){
-        if(!document.querySelector(`#typewriter-effect`)) this.element.innerHTML = `<span id="typewriter-typer"></span><span id="typewriter-effect">|</span>`;
+        if(!document.querySelector(`#typewriter-effect`)){
+          this.element.innerHTML = `<span id="typewriter-typer"></span>`;
+          if(typeof this.options.cursor === 'object'){
+            if(this.options.cursor['enabled'] !== false){
+              this.element.innerHTML += `<span id="typewriter-effect">|</span>`;
+            }
+          } else this.element.innerHTML += `<span id="typewriter-effect">|</span>`;
+        }
         (async () => {
             var i;
             for(i = 0; i < this.save.length;){
@@ -97,9 +105,6 @@ class TypeWriter{
                 await this.__wait(this.timeout);
             }
             if(this.options.loop) this.start();
-            else {
-              if(typeof this.options.onend === 'function') this.options.onend.call(this);
-            }
         })();
     }
     __wait(ms){
