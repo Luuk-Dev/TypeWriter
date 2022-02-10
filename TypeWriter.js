@@ -9,9 +9,12 @@
  * 
  * You're free to use this library as long as you keep this statement in this file
  */
+var __typewriter_cuid = 0;
 class TypeWriter{
     constructor(object, options){
         if(typeof object !== 'string' && typeof object !== 'object') return console.error(`Invalid element! Element must be a string or an object.`);
+        __typewriter_cuid = __typewriter_cuid + 1;
+        this.id = __typewriter_cuid;
         this.element = typeof object === 'object' ? object : document.querySelector(object);
         if(!this.element) return console.error(`The element does not exists!`);
         this.save = [];
@@ -26,37 +29,42 @@ class TypeWriter{
         const cursor = this.options.cursor || defaultcursor;
         const stylesheet = document.createElement(`style`);
         stylesheet.type = "text/css";
-        stylesheet.innerHTML = `#typewriter-effect{font-size:${cursor.size || defaultcursor.size};animation:TypeWriter ${(cursor.speed || defaultcursor.speed)/1000}s infinite;}@keyframes TypeWriter{0%{opacity: 0;}50%{opacity: 1;}100%{opacity: 0;}}`;
+        stylesheet.innerHTML = `#typewriter-effect-${this.id}{font-size:${cursor.size || defaultcursor.size};animation:TypeWriter ${(cursor.speed || defaultcursor.speed)/1000}s infinite;}@keyframes TypeWriter{0%{opacity: 0;}50%{opacity: 1;}100%{opacity: 0;}}`;
         stylesheet.id = cursor.id || defaultcursor.id;
         if((cursor['enabled'] || defaultcursor.enabled) === true) document.head.appendChild(stylesheet);
     }
     wait(ms){
         if(typeof ms !== 'number') return console.error(`Invalid number! MS must be a number.`);
-        this.save.push({wait: ms, value: null, remove: null});
+        this.save.push({wait: ms, value: null, remove: null, writing: false});
         return this;
     }
     write(value){
         if(typeof value !== 'string') return console.error(`Invalid value! Value must be a string.`)
-        this.save.push({wait: null, value: value, remove: null});
+        this.save.push({wait: null, value: value, remove: null, writing: true});
         return this;
     }
     removeAll(){
-        this.save.push({wait: null, value: null, remove: true});
+        this.save.push({wait: null, value: null, remove: true, writing: false});
         return this;
     }
     remove(charAt){
         if(typeof charAt !== 'number') return console.error(`Invalid position of string! The position must be a number.`);
-        this.save.push({wait: null, value: null, remove: charAt});
+        this.save.push({wait: null, value: null, remove: charAt, writing: false});
         return this;
     }
+    addText(value){
+      if(typeof value !== 'string') return console.error(`Invalid value! Value must be a string.`);
+      this.save.push({wait: null, value: value, remove: null, writing: false})
+      return this;
+    }
     start(){
-        if(!document.querySelector(`#typewriter-effect`)){
-          this.element.innerHTML = `<span id="typewriter-typer"></span>`;
+        if(!document.querySelector(`#typewriter-effect-${this.id}`)){
+          this.element.innerHTML = `<span id="typewriter-typer-${this.id}"></span>`;
           if(typeof this.options.cursor === 'object'){
             if(this.options.cursor['enabled'] !== false){
-              this.element.innerHTML += `<span id="typewriter-effect">|</span>`;
+              this.element.innerHTML += `<span id="typewriter-effect-${this.id}">|</span>`;
             }
-          } else this.element.innerHTML += `<span id="typewriter-effect">|</span>`;
+          } else this.element.innerHTML += `<span id="typewriter-effect-${this.id}">|</span>`;
         }
         (async () => {
             var i;
@@ -66,20 +74,24 @@ class TypeWriter{
                     await this.__wait(obj.wait);
                     ++i;
                 } else if(obj.value){
-                    const text = document.querySelector(`#typewriter-typer`);
+                    const text = document.querySelector(`#typewriter-typer-${this.id}`);
                     if(!text) return ++i;
-                    var val = text.innerHTML;
-                    var objlength = '';
-                    while(objlength !== obj.value){
-                        await this.__wait(this.timeout);
-                        val = val + obj.value.charAt(objlength.length);
-                        objlength += obj.value.charAt(objlength.length);
-                        text.innerHTML = val;
+                    if(obj.writing === true){
+                      var val = text.innerHTML;
+                      var objlength = '';
+                      while(objlength !== obj.value){
+                          await this.__wait(this.timeout);
+                          val = val + obj.value.charAt(objlength.length);
+                          objlength += obj.value.charAt(objlength.length);
+                          text.innerHTML = val;
+                      }
+                    } else {
+                      text.innerHTML += obj.value;
                     }
                     ++i;
                 } else if(obj.remove){
                     if(obj.remove === true){
-                        const text = document.querySelector(`#typewriter-typer`);
+                        const text = document.querySelector(`#typewriter-typer-${this.id}`);
                         if(!text) return ++i;
                         var val = text.innerHTML;
                         while(val !== ''){
@@ -89,7 +101,7 @@ class TypeWriter{
                         }
                         ++i;
                     } else {
-                        const text = document.querySelector(`#typewriter-typer`);
+                        const text = document.querySelector(`#typewriter-typer-${this.id}`);
                         if(!text) return ++i;
                         var val = text.innerHTML;
                         while(val !== val.substring(0, obj.remove)){
@@ -103,6 +115,11 @@ class TypeWriter{
             }
             while(i !== this.save.length){
                 await this.__wait(this.timeout);
+            }
+            if(typeof this.options.callback === 'object'){
+              if(typeof this.options.callback.onend === 'function'){
+                this.options.callback.onend();
+              }
             }
             if(this.options.loop) this.start();
         })();
