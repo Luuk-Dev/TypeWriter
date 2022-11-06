@@ -20,6 +20,7 @@ class TypeWriter{
         this.save = [];
         this.options = options || {};
         this.timeout = this.options.timeout || 100;
+        this.running = true;
         const defaultcursor = {
           speed: 1000,
           size: 'larger',
@@ -69,6 +70,9 @@ class TypeWriter{
         (async () => {
             var i;
             for(i = 0; i < this.save.length;){
+                if(this.running === false){
+                    break;
+                }
                 const obj = this.save[i];
                 if(obj.wait){
                     await this.__wait(obj.wait);
@@ -79,7 +83,7 @@ class TypeWriter{
                     if(obj.writing === true){
                       var val = text.innerHTML;
                       var objlength = '';
-                      while(objlength !== obj.value){
+                      while(objlength !== obj.value && this.running === true){
                           await this.__wait(this.timeout);
                           val = val + obj.value.charAt(objlength.length);
                           objlength += obj.value.charAt(objlength.length);
@@ -94,7 +98,7 @@ class TypeWriter{
                         const text = document.querySelector(`#typewriter-typer-${this.id}`);
                         if(!text) return ++i;
                         var val = text.innerHTML;
-                        while(val !== ''){
+                        while(val !== '' && this.running === true){
                             await this.__wait(this.timeout);
                             val = val.substring(0, val.length - 1);
                             text.innerHTML = val;
@@ -104,7 +108,7 @@ class TypeWriter{
                         const text = document.querySelector(`#typewriter-typer-${this.id}`);
                         if(!text) return ++i;
                         var val = text.innerHTML;
-                        while(val !== val.substring(0, obj.remove)){
+                        while(val !== val.substring(0, obj.remove) && this.running === true){
                             await this.__wait(this.timeout);
                             val = val.substring(0, val.length - 1);
                             text.innerHTML = val;
@@ -123,6 +127,9 @@ class TypeWriter{
             }
             if(this.options.loop) this.start();
         })();
+    }
+    stop(){
+        this.running = false;
     }
     __wait(ms){
         return new Promise((resolve, reject) => {
