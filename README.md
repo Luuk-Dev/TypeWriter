@@ -12,6 +12,8 @@ Create easily a TypeWriter effect for your website
 > Repository: https://github.com/Luuk-Dev/TypeWriter
 
 ## How to use
+
+### TypeWriter class
 You need to call the `TypeWriter` class in your JavaScript. The class has two parameters. The first one is required, this is the element where you want to add the TypeWriter effect. This can be the element itself or a string to get the element. The second parameter is the custom options. This is an object with the following options:
 - timeout: The time to wait before adding the new character to the string in miliseconds. Default is `100`ms.
 - loop: Whether the TypeWriter should be looped for the element or not. Default is `false`.
@@ -22,6 +24,16 @@ You need to call the `TypeWriter` class in your JavaScript. The class has two pa
    - enabled: Whether the cursor should be enabled or not. Default is `true`.
 - callback: An object where you can put the available callbacks in.
    - onend: A callback which will be called once the TypeWriter ends. Only available if the `loop` is set to `false`.
+   
+### Functions:
+The `TypeWriter` class has multiple functions to customize your typewriter.
+- wait: Lets the typewriter wait a certain amount of milliseconds before performing the next action. Has one parameter where the amount of time in milliseconds should be provided
+- write: The text that should be written with a TypeWriter effect. Has one parameter which is the text to write and must be a string.
+- addText: Adds a text to the current string without the TypeWriter effect. Has one parameter which is the text to add and must be a string.
+- removeAll: Removes all the current text with a TypeWriter effect. Has no parameters.
+- remove: Removes a certain amount of characters from the current string. Has one parameter which is the last index of the character that should not be removed and must be a number.
+- start: Starts the complete TypeWriter effect. Must be fired to start the TypeWriter effect. Has no parameters.
+- stop: Stops the TypeWriter when it's running. Has no parameters.
 
 ## Demo
 Watch a live demo [here](https://typewriter.luukdev.repl.co)
